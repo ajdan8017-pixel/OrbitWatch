@@ -1,0 +1,6 @@
+{
+  "name": "OrbitWatch - 3D Космический Трекер",
+  "description": "Интерактивная 3D-визуализация спутников на орбите Земли в реальном времени, расчет TLE с satellite.js и каталог космических миссий.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
