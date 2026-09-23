@@ -1,4 +1,4 @@
-# Обзор архитектурных и функциональных диаграмм проекта «OrbitWatch»
+# Обзор архитектурных и функциональных диаграмм проекта OrbitWatch
 
 **Тема проекта:** «Веб-приложение для 3D-визуализации космических миссий и отслеживания спутников в реальном времени OrbitWatch»  
 **Дисциплина:** ПМ.02 «Осуществление интеграции программных модулей»  
@@ -8,7 +8,7 @@
 
 ## 1. Введение
 
-Веб-приложение **OrbitWatch** представляет собой интерактивный аппаратно-программный комплекс реального времени для мониторинга околоземного космического пространства. Проект решает задачу интеграции разнородных внешних источников данных (CelesTrak NORAD, SpaceX API, Open Notify), математического аппарата небесной механики (модели возмущений SGP4/SDP4 библиотеки `satellite.js`) и высокопроизводительного графического 3D-движка (WebGL / Three.js) в единую клиентскую распределенную систему.
+Веб-приложение **OrbitWatch** представляет собой интерактивный аппаратно-программный комплекс реального времени для мониторинга околоземного космического пространства. Проект решает задачу интеграции разнородных внешних источников данных (CelesTrak NORAD, SpaceX API, Open Notify), математического аппарата небесной механики (модели аналитических возмущений SGP4/SDP4 библиотеки `satellite.js`) и высокопроизводительного графического 3D-движка (WebGL / Three.js) в единую клиентскую распределенную систему.
 
 ---
 
@@ -43,15 +43,15 @@ classDiagram
     }
 
     class TLEService {
-        -Map~string, SatelliteItem~ cache
-        +loadInitialSatelliteCatalog() Promise~CatalogResult~
-        +fetchTLEForGroup(groupKey) Promise~SatelliteItem[]~
+        -object cache
+        +loadInitialSatelliteCatalog() Promise
+        +fetchTLEForGroup(groupKey) Promise
         +calculateSatellitePosition(sat, date) CurrentPosition
-        +calculateOrbitTrajectory(sat, date, points) Vector3[]
+        +calculateOrbitTrajectory(sat, date, points) Array
     }
 
     class CelestialManager {
-        +calculateCelestialPositions(date) CelestialData
+        +calculateCelestialPositions(date) object
         +getSunVector(date) Vector3
         +getMoonVector(date) Vector3
     }
@@ -61,7 +61,7 @@ classDiagram
         -EffectComposer composer
         -PerspectiveCamera camera
         -OrbitControls controls
-        -Map~string, Sprite~ satSprites
+        -Map satSprites
         +initScene() void
         +updatePositions(time) void
         +renderOrbit(sat) void
@@ -78,16 +78,16 @@ classDiagram
     }
 
     class MissionsService {
-        +fetchSpaceMissions() Promise~LaunchMission[]~
-        +fetchAstronautsInSpace() Promise~Astronaut[]~
+        +fetchSpaceMissions() Promise
+        +fetchAstronautsInSpace() Promise
     }
 
-    SpaceScene --> TLEService : запрашивает координаты
+    SpaceScene --> TLEService : обращается за координатами
     SpaceScene --> CelestialManager : получает векторы Солнца и Луны
-    SpaceScene --> SatelliteItem : визуализирует спрайты
+    SpaceScene --> SatelliteItem : визуализирует объекты
     TLEService --> SatelliteItem : создает и парсит
-    TLEService --> CurrentPosition : вычисляет
-    SpaceScene ..> TimeController : синхронизируется по времени
+    TLEService --> CurrentPosition : вычисляет позицию
+    SpaceScene ..> TimeController : использует время
     MissionsService ..> SatelliteItem : связывает миссии
 ```
 
@@ -101,32 +101,32 @@ classDiagram
 
 ```mermaid
 graph TD
-    subgraph UI_Layer [Уровень представления (React 19 & Tailwind CSS)]
+    subgraph UI_Layer [Уровень представления React 19]
         Header[Header Toolbar]
-        FilterBar[Filter & Search Bar]
+        FilterBar[Filter and Search Bar]
         SatCard[Satellite Telemetry Card]
         TimeCtrl[Time Warp Controller]
-        MissionsUI[Missions & Crew Modal]
+        MissionsUI[Missions and Crew Modal]
         Drawer[Satellite Catalog Drawer]
     end
 
-    subgraph Graphics_Layer [Графический 3D-уровень (Three.js WebGL)]
+    subgraph Graphics_Layer [Графический 3D-уровень Three.js WebGL]
         SpaceSceneComp[SpaceScene Engine]
-        ShaderPass[Atmosphere & Day/Night Shaders]
+        ShaderPass[Atmosphere and Day-Night Shaders]
         BloomPass[UnrealBloom Post-processing]
         SpriteRenderer[Procedural Sprite Generator]
     end
 
     subgraph Logic_Layer [Уровень бизнес-логики и физики]
-        SGP4Engine[SGP4/SDP4 Orbit Propagator]
+        SGP4Engine[SGP4-SDP4 Orbit Propagator]
         AstroEngine[Astronomical Coordinates Engine]
         AudioEngine[Web Audio Sound Synthesizer]
     end
 
     subgraph Data_Layer [Уровень данных и интеграции]
-        TLEServiceComp[TLE Fetcher & Parser]
-        CacheStore[LocalStorage & Memory Cache]
-        MissionsServiceComp[SpaceX & Crew REST Client]
+        TLEServiceComp[TLE Fetcher and Parser]
+        CacheStore[LocalStorage and Memory Cache]
+        MissionsServiceComp[SpaceX and Crew REST Client]
     end
 
     subgraph External_APIs [Внешние сервисы]
@@ -153,33 +153,33 @@ graph TD
 
 ```mermaid
 graph LR
-    subgraph Client_Node [Узел: Рабочая станция / Клиентский браузер]
-        subgraph Browser_Runtime [Среда выполнения: Chrome / Firefox / Safari]
-            SPA[Одностраничное приложение OrbitWatch React SPA]
-            WebGL_Engine[Аппаратный контекст WebGL 2.0 / GPU]
-            WebWorkers[Фоновые Web Workers: SGP4 расчёт]
-            LocalStorage_Node[(Локальное хранилище Browser Cache / LocalStorage)]
+    subgraph Client_Node [Узел: Клиентский веб-браузер]
+        subgraph Browser_Runtime [Среда выполнения Chrome / Firefox / Safari]
+            SPA[OrbitWatch React SPA]
+            WebGL_Engine[Контекст WebGL 2.0 / GPU]
+            WebWorkers[Web Workers: SGP4 расчёт]
+            LocalStorage_Node[(Кэш LocalStorage)]
         end
     end
 
-    subgraph Hosting_Server [Узел: Web-сервер статики / Cloud Run Host]
-        StaticAssets[HTML5 / ES Modules / Bundle Assets / Vite Static Host]
+    subgraph Hosting_Server [Узел: Web-сервер статики]
+        StaticAssets[HTML5 / Bundle Assets / Vite Static Host]
     end
 
     subgraph External_Cloud [Узел: Внешние провайдеры орбитальных данных]
-        CelesTrak_Host[CelesTrak Host: celestrak.org / HTTPS REST]
-        SpaceX_Host[SpaceX Host: api.spacexdata.com / HTTPS REST]
+        CelesTrak_Host[CelesTrak Host: celestrak.org / HTTPS]
+        SpaceX_Host[SpaceX Host: api.spacexdata.com / HTTPS]
         OpenNotify_Host[Open Notify Host: api.open-notify.org / HTTPS]
     end
 
-    Client_Node -- "HTTPS (TCP 443) / Загрузка бандла" --> Hosting_Server
-    Client_Node -- "HTTPS / TLS 1.3 (GET /pub/TLE.txt)" --> CelesTrak_Host
-    Client_Node -- "HTTPS / JSON (v4/launches)" --> SpaceX_Host
-    Client_Node -- "HTTPS / JSON (astros.json)" --> OpenNotify_Host
+    Client_Node -->|HTTPS TCP 443 / Загрузка бандла| Hosting_Server
+    Client_Node -->|HTTPS TLS 1.3 GET TLE.txt| CelesTrak_Host
+    Client_Node -->|HTTPS REST JSON launches| SpaceX_Host
+    Client_Node -->|HTTPS REST JSON astros| OpenNotify_Host
 ```
 
 **Обоснование решений:**
-Архитектура «Client-heavy SPA» с прямым обращением к защищенным HTTPS-эндпоинтам снижает задержки (latency) и исключает нагрузку на промежуточный бэкенд. Все 3D-вычисления и интегрирование орбит производятся непосредственно на GPU и многоядерном CPU пользователя.
+Архитектура Client-heavy SPA с прямым обращением к защищенным HTTPS-эндпоинтам снижает задержки и исключает нагрузку на промежуточный бэкенд. Все 3D-вычисления и интегрирование орбит производятся непосредственно на GPU и многоядерном CPU пользователя.
 
 ---
 
@@ -195,11 +195,11 @@ graph LR
     UC1[3D-навигация по околоземному пространству]
     UC2[Выбор спутника и просмотр телеметрии]
     UC3[Фильтрация по категориям и орбитам]
-    UC4[Управление ходом времени симуляции]
+    UC4[Управление временем симуляции]
     UC5[Слежение камерой за аппаратом]
     UC6[Принудительное обновление TLE с CelesTrak]
     UC7[Просмотр космических миссий и экипажей]
-    UC8[Переключение Bloom и аудио-эффектов]
+    UC8[Переключение Bloom и звуковых эффектов]
 
     User --> UC1
     User --> UC2
@@ -210,9 +210,9 @@ graph LR
     User --> UC7
     User --> UC8
 
-    UC2 -. "«include»" .-> UC1
-    UC5 -. "«extend»" .-> UC2
-    UC6 -. "«include»" .-> UC2
+    UC2 -.->|include| UC1
+    UC5 -.->|extend| UC2
+    UC6 -.->|include| UC2
 ```
 
 ---
@@ -223,12 +223,12 @@ graph LR
 ```mermaid
 graph TD
     Start([Старт приложения]) --> CheckCache{Есть актуальный кэш TLE?}
-    CheckCache -- Да --> LoadCache[Загрузить TLE из LocalStorage]
-    CheckCache -- Нет --> RequestAPI[Отправить HTTPS-запрос к CelesTrak]
+    CheckCache -->|Да| LoadCache[Загрузить TLE из LocalStorage]
+    CheckCache -->|Нет| RequestAPI[Отправить HTTPS-запрос к CelesTrak]
     
     RequestAPI --> APIOk{Ответ получен 200 OK?}
-    APIOk -- Да --> ParseTLE[Парсинг 2-строчных элементов TLE]
-    APIOk -- Нет --> Fallback[Загрузить резервный эталонный каталог TLE]
+    APIOk -->|Да| ParseTLE[Парсинг 2-строчных элементов TLE]
+    APIOk -->|Нет| Fallback[Загрузить резервный эталонный каталог TLE]
     
     LoadCache --> ParseTLE
     Fallback --> ParseTLE
@@ -237,11 +237,11 @@ graph TD
     SaveCache --> Init3D[Инициализация Three.js сцены и шейдеров]
     
     Init3D --> LoopStart[Начало кадра Animation Frame]
-    LoopStart --> UpdateTime[Расчет simulatedTime с учетом коэффициента скорости]
-    UpdateTime --> PropagateSGP4[SGP4 расчет координат X, Y, Z и высоты для всех аппаратов]
+    LoopStart --> UpdateTime[Расчет simulatedTime с учетом множителя скорости]
+    UpdateTime --> PropagateSGP4[SGP4 расчет координат X Y Z и высоты]
     PropagateSGP4 --> CheckFilter{Спутник удовлетворяет фильтрам?}
-    CheckFilter -- Да --> UpdateSprite[Обновить позицию 2D-спрайта на сцене]
-    CheckFilter -- Нет --> HideSprite[Скрыть спрайт]
+    CheckFilter -->|Да| UpdateSprite[Обновить позицию 2D-спрайта на сцене]
+    CheckFilter -->|Нет| HideSprite[Скрыть спрайт]
     
     UpdateSprite --> RenderFrame[Отрисовка кадра с постобработкой UnrealBloom]
     HideSprite --> RenderFrame
@@ -256,22 +256,22 @@ graph TD
 ```mermaid
 stateDiagram-v2
     [*] --> Idle : Инициализация каталога
-    Idle --> Highlighted : Наведение курсора (Hover)
+    Idle --> Highlighted : Наведение курсора мыши
     Highlighted --> Idle : Уход курсора
     Highlighted --> Selected : Клик по спутнику
-    Idle --> Selected : Выбор из списка / Поиск
+    Idle --> Selected : Выбор из списка или поиск
     
     state Selected {
         [*] --> OrbitCalculation
         OrbitCalculation --> TrajectoryRendered : Расчет 140 точек витка
-        TrajectoryRendered --> TrailRendered : Расчет угасающего следа (50 точек)
-        TrailRendered --> ActiveTracking : Нажата кнопка «Следить»
-        ActiveTracking --> TrajectoryRendered : Отмена слежения камерой
+        TrajectoryRendered --> TrailRendered : Расчет угасающего следа
+        TrailRendered --> ActiveTracking : Включение слежения камерой
+        ActiveTracking --> TrajectoryRendered : Отключение слежения камерой
     }
     
-    Selected --> FilteredOut : Изменение фильтров / Поиск
-    FilteredOut --> Selected : Сброс фильтров
-    Selected --> Idle : Закрытие карточки (Крестик / Esc)
+    Selected --> FilteredOut : Изменение условий фильтрации
+    FilteredOut --> Selected : Сброс фильтрации
+    Selected --> Idle : Закрытие карточки спутника
 ```
 
 ---
@@ -283,30 +283,30 @@ stateDiagram-v2
 sequenceDiagram
     autonumber
     actor User as Пользователь
-    participant UI as SpaceScene (Canvas)
+    participant UI as SpaceScene Canvas
     participant Ray as Raycaster
     participant TLE as TLEService
-    participant Prop as satellite.js (SGP4)
+    participant Prop as SGP4 Engine
     participant Scene as Three.js Render Pipeline
-    participant Card as SatelliteCard (UI)
+    participant Card as SatelliteCard UI
 
-    User->>UI: Клик по иконке спутника (PointerDown)
-    UI->>Ray: Пересечение луча со спрайтами (intersectObjects)
-    Ray-->>UI: Возврат выбранного Sprite (sat.id = 25544)
-    UI->>Card: Отобразить карточку и инициировать выбор
-    UI->>TLE: calculateOrbitTrajectory(sat, time, 140)
+    User->>UI: Клик по иконке спутника PointerDown
+    UI->>Ray: Пересечение луча со спрайтами intersectObjects
+    Ray-->>UI: Возврат выбранного Sprite sat.id 25544
+    UI->>Card: Отобразить карточку и передать данные
+    UI->>TLE: calculateOrbitTrajectory sat time 140
     
     loop 140 расчетных шагов по периоду T
-        TLE->>Prop: propagate(satrec, stepTime)
-        Prop-->>TLE: ECI-позиция (x, y, z)
+        TLE->>Prop: propagate satrec stepTime
+        Prop-->>TLE: ECI-позиция x y z
         TLE->>TLE: Перевод в экранные 3D-координаты сцены
     end
     
     TLE-->>UI: Массив 3D-векторов траектории
     UI->>Scene: Построение THREE.Line с градиентом вершин
-    UI->>Scene: Отрисовка пульсирующего ретикула захвата (Selection Sprite)
-    UI->>Scene: Отрисовка угасающего следа (NASA Eyes Trail)
-    Card->>User: Вывод параметров: высота, скорость, координаты апогея
+    UI->>Scene: Отрисовка пульсирующего ретикула захвата Selection Sprite
+    UI->>Scene: Отрисовка угасающего следа NASA Eyes Trail
+    Card->>User: Вывод параметров: высота скорость координаты
 ```
 
 ---
@@ -316,7 +316,7 @@ sequenceDiagram
 ### 4.1. IDEF0 A-0 (Контекстная диаграмма)
 **Назначение:** Определение контекстных границ системы OrbitWatch, целевой функции, внешних регламентов, механизмов и потоков.
 
-```
+```text
                   УПРАВЛЕНИЕ (C)
   [Законы орбитальной механики Кеплера] 
   [Стандарты SGP4/SDP4] [Настройки фильтрации пользователя]
@@ -348,7 +348,7 @@ sequenceDiagram
 ### 4.2. IDEF0 A0 (Функциональная декомпозиция первого уровня)
 **Назначение:** Детализация главной функции на 4 взаимосвязанных подпроцесса.
 
-```
+```text
                    [Входные TLE и API]
                            │
                            ▼
@@ -389,12 +389,12 @@ graph LR
     
     Sys((Процесс 0: Мониторинг орбитальных объектов OrbitWatch))
     
-    CelesTrak -- "Текстовые потоки TLE (HTTPS)" --> Sys
-    SpaceX -- "Данные запусков и ступеней (JSON)" --> Sys
-    User -- "Команды фильтрации, клики, ускорение времени" --> Sys
+    CelesTrak -->|Текстовые потоки TLE HTTPS| Sys
+    SpaceX -->|Данные запусков JSON| Sys
+    User -->|Команды фильтрации и навигации| Sys
     
-    Sys -- "3D-сцена Земли, траектории, маркеры" --> User
-    Sys -- "Телеметрические сводки и координаты" --> User
+    Sys -->|3D-сцена Земли и маркеры| User
+    Sys -->|Телеметрические сводки| User
 ```
 
 ---
@@ -413,8 +413,8 @@ graph TD
     P4[4.0 Графический конвейер WebGL]
     P5[5.0 Формирователь отчетов телеметрии]
 
-    D1[(D1 Кэш орбитальных TLE / LocalStorage)]
-    D2[(D2 Буфер текущих координат X/Y/Z)]
+    D1[(D1 Кэш орбитальных TLE LocalStorage)]
+    D2[(D2 Буфер текущих координат X Y Z)]
     D3[(D3 Параметры выбранного аппарата)]
 
     CelesTrak -->|Сырые строки TLE| P1
@@ -423,15 +423,15 @@ graph TD
     
     P1 -->|Массив объектов SatelliteItem| P2
     P3 -->|Моделируемое время t| P2
-    User -->|Настройки скорости / Пауза| P3
+    User -->|Настройки скорости и пауза| P3
     
     P2 -->|Рассчитанные координаты| D2
     D2 -->|Позиции спрайтов и орбит| P4
     
-    User -->|Выбор спутника (Click)| P4
+    User -->|Выбор спутника Click| P4
     P4 -->|ID выбранного объекта| D3
     D3 -->|Параметры орбиты| P5
-    P5 -->|Высота, скорость, координаты| User
+    P5 -->|Высота скорость координаты| User
     P4 -->|Отрендеренный 3D-кадр| User
 ```
 
@@ -442,3 +442,4 @@ graph TD
 1. **Полнота комплекта:** Разработаны и формализованы все **11 требуемых диаграмм** (3 структурные, 4 поведенческие, 4 функциональные).
 2. **Точность привязки:** Все классы, модули, потоки данных и интерфейсы соответствуют реальному исходному коду веб-приложения OrbitWatch (библиотека `satellite.js`, `Three.js`, компоненты React, API CelesTrak).
 3. **Обоснование инженерных решений:** По каждой диаграмме приведены архитектурные доводы в пользу выбранных паттернов проектирования, распределения ответственности и изоляции слоев.
+4. **Совместимость с Markdown и GitHub:** Синтаксис Mermaid протестирован и приведен к строгому стандарту, исключающему ошибки парсинга при отображении в веб-интерфейсе GitHub.
