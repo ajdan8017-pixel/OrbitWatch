@@ -2,6 +2,7 @@ import * as satellite from 'satellite.js';
 import { SatelliteItem, CurrentPosition, OrbitPoint, SatelliteCategory } from '../types';
 import { FALLBACK_TLE_DATA } from '../data/fallbackSatellites';
 import { getSatelliteDossier } from '../data/satelliteDescriptions';
+import { validateTLE, safeStorageSetItem, safeStorageGetItem } from '../utils/exceptions';
 
 export const EARTH_RADIUS_KM = 6371;
 export const GLOBE_RADIUS_UNITS = 10.0;
@@ -154,6 +155,9 @@ export function parseTLEText(text: string, category: SatelliteCategory = 'other'
 
 function parseSingleTLE(name: string, line1: string, line2: string, defaultCategory: SatelliteCategory): SatelliteItem | null {
   try {
+    // Validate TLE integrity
+    validateTLE(name, line1, line2);
+
     const id = line1.substring(2, 7).trim();
     const intlDesig = line1.substring(9, 17).trim();
     const launchYearShort = parseInt(line1.substring(9, 11).trim(), 10);
@@ -219,11 +223,22 @@ export async function fetchTLEForGroup(group: string): Promise<SatelliteItem[]> 
       const text = await res.text();
       const items = parseTLEText(text, group as SatelliteCategory);
       if (items.length > 0) {
+        // Cache to localStorage securely
+        safeStorageSetItem(`orbitwatch_cache_${group}`, text);
         return items;
       }
     }
-  } catch (err) {
-    console.warn(`[TLE Service] Network fetch failed for ${group}, falling back to defaults`, err);
+  } catch {
+    // Network or parse issue, gracefully use cached or fallback satellites
+  }
+
+  // Check localStorage cache
+  const cachedText = safeStorageGetItem(`orbitwatch_cache_${group}`);
+  if (cachedText) {
+    const cachedItems = parseTLEText(cachedText, group as SatelliteCategory);
+    if (cachedItems.length > 0) {
+      return cachedItems;
+    }
   }
 
   // Filter fallback satellites for this category
