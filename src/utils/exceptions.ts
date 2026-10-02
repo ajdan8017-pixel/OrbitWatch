@@ -1,9 +1,15 @@
 /**
  * Иерархия классов исключений и валидаторы для веб-приложения OrbitWatch
- * Разработано в рамках Дня 7: «Обработка исключительных ситуаций и отказоустойчивость»
+ * Разработано в рамках Дня 7 и доработано в рамках Дня 11 (Инспекция кода и стандарты кодирования)
  */
 
 export type ErrorSeverity = 'critical' | 'warning' | 'info';
+
+// Constants for TLE and Storage (NC-03 fix: eliminate magic numbers)
+export const TLE_LINE_LENGTH = 69;
+export const TLE_CHECKSUM_DATA_LENGTH = 68;
+export const DOM_QUOTA_ERROR_LEGACY_CODES = [22, 1014] as const;
+export const DEFAULT_STORAGE_QUOTA_LIMIT_MB = 5;
 
 export class OrbitWatchError extends Error {
   public readonly code: string;
@@ -73,12 +79,15 @@ export class NetworkProxyError extends OrbitWatchError {
 // ----------------- Функции-валидаторы -----------------
 
 /**
- * Валидация контрольной суммы строки TLE по стандарту NORAD
+ * Валидация контрольной суммы строки TLE по стандарту NORAD (по модулю 10).
+ * @param line - Строка TLE (line1 или line2)
+ * @returns Вычисленная контрольная сумма (0..9)
  */
 export function calculateTLEChecksum(line: string): number {
   let checksum = 0;
   // Контрольная сумма считается по первым 68 символам
-  for (let i = 0; i < Math.min(line.length - 1, 68); i++) {
+  const maxIdx = Math.min(line.length - 1, TLE_CHECKSUM_DATA_LENGTH);
+  for (let i = 0; i < maxIdx; i++) {
     const char = line[i];
     if (char >= '0' && char <= '9') {
       checksum += parseInt(char, 10);
@@ -92,8 +101,13 @@ export function calculateTLEChecksum(line: string): number {
 /**
  * Проверка валидности двухстрочного набора TLE (Two-Line Element Set)
  * Стратегия: Fail Fast при передаче пользовательских TLE
+ * @param line1 - Первая строка TLE
+ * @param line2 - Вторая строка TLE
+ * @param strictChecksum - Флаг строгой сверки контрольной суммы (по умолчанию true)
+ * @throws {TleValidationError} При нарушении структуры, длины или контрольной суммы
+ * @returns true при успешной валидации
  */
-export function validateTLE(line1: string, line2: string): boolean {
+export function validateTLE(line1: string, line2: string, strictChecksum = true): boolean {
   if (!line1 || !line2) {
     throw new TleValidationError('Строки TLE не могут быть пустыми');
   }
@@ -101,8 +115,8 @@ export function validateTLE(line1: string, line2: string): boolean {
   const cleanL1 = line1.trim();
   const cleanL2 = line2.trim();
 
-  if (cleanL1.length !== 69 || cleanL2.length !== 69) {
-    throw new TleValidationError('Неверная длина строки TLE: ожидается ровно 69 символов', {
+  if (cleanL1.length !== TLE_LINE_LENGTH || cleanL2.length !== TLE_LINE_LENGTH) {
+    throw new TleValidationError(`Неверная длина строки TLE: ожидается ровно ${TLE_LINE_LENGTH} символов`, {
       l1Length: cleanL1.length,
       l2Length: cleanL2.length
     });
@@ -112,16 +126,18 @@ export function validateTLE(line1: string, line2: string): boolean {
     throw new TleValidationError('Строка 1 должна начинаться с "1 ", а строка 2 — с "2 "');
   }
 
-  const expectedSum1 = parseInt(cleanL1[68], 10);
-  const calculatedSum1 = calculateTLEChecksum(cleanL1);
-  if (!isNaN(expectedSum1) && expectedSum1 !== calculatedSum1) {
-    throw new TleValidationError(`Несовпадение контрольной суммы строки 1: ожидалось ${expectedSum1}, получено ${calculatedSum1}`);
-  }
+  if (strictChecksum) {
+    const expectedSum1 = parseInt(cleanL1[TLE_CHECKSUM_DATA_LENGTH], 10);
+    const calculatedSum1 = calculateTLEChecksum(cleanL1);
+    if (!isNaN(expectedSum1) && expectedSum1 !== calculatedSum1) {
+      throw new TleValidationError(`Несовпадение контрольной суммы строки 1: ожидалось ${expectedSum1}, получено ${calculatedSum1}`);
+    }
 
-  const expectedSum2 = parseInt(cleanL2[68], 10);
-  const calculatedSum2 = calculateTLEChecksum(cleanL2);
-  if (!isNaN(expectedSum2) && expectedSum2 !== calculatedSum2) {
-    throw new TleValidationError(`Несовпадение контрольной суммы строки 2: ожидалось ${expectedSum2}, получено ${calculatedSum2}`);
+    const expectedSum2 = parseInt(cleanL2[TLE_CHECKSUM_DATA_LENGTH], 10);
+    const calculatedSum2 = calculateTLEChecksum(cleanL2);
+    if (!isNaN(expectedSum2) && expectedSum2 !== calculatedSum2) {
+      throw new TleValidationError(`Несовпадение контрольной суммы строки 2: ожидалось ${expectedSum2}, получено ${calculatedSum2}`);
+    }
   }
 
   return true;
@@ -130,6 +146,10 @@ export function validateTLE(line1: string, line2: string): boolean {
 /**
  * Безопасное сохранение данных в LocalStorage с защитой от QuotaExceededError
  * Стратегия: Graceful Degradation
+ * @param key - Ключ хранилища
+ * @param value - Строковое значение для записи
+ * @returns true если запись успешна, false если запись не удалась без фатальной ошибки
+ * @throws {StorageQuotaError} Если лимит превышен даже после очистки временного кэша
  */
 export function safeLocalStorageSet(key: string, value: string): boolean {
   try {
@@ -137,8 +157,7 @@ export function safeLocalStorageSet(key: string, value: string): boolean {
     return true;
   } catch (e: unknown) {
     if (e instanceof DOMException && (
-      e.code === 22 ||
-      e.code === 1014 ||
+      (DOM_QUOTA_ERROR_LEGACY_CODES as readonly number[]).includes(e.code) ||
       e.name === 'QuotaExceededError' ||
       e.name === 'NS_ERROR_DOM_QUOTA_REACHED'
     )) {
@@ -148,17 +167,25 @@ export function safeLocalStorageSet(key: string, value: string): boolean {
         localStorage.setItem(key, value);
         return true;
       } catch {
-        throw new StorageQuotaError('Превышен лимит хранилища LocalStorage (5MB)', { key });
+        throw new StorageQuotaError(`Превышен лимит хранилища LocalStorage (${DEFAULT_STORAGE_QUOTA_LIMIT_MB}MB)`, { key });
       }
     }
     return false;
   }
 }
 
+/**
+ * Алиас для безопасного сохранения данных (NC-05 унификация)
+ */
 export function safeStorageSetItem(key: string, value: string): boolean {
   return safeLocalStorageSet(key, value);
 }
 
+/**
+ * Безопасное чтение значения из LocalStorage
+ * @param key - Ключ хранилища
+ * @returns Строковое значение либо null при отсутствии/ошибке доступа
+ */
 export function safeStorageGetItem(key: string): string | null {
   try {
     return localStorage.getItem(key);
