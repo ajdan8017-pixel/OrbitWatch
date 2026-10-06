@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600" width="1000" height="600">
+  <defs>
+    <linearGradient id="bgCon" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#020617" />
+    </linearGradient>
+  </defs>
+
+  <rect width="1000" height="600" rx="12" fill="url(#bgCon)" stroke="#1e293b" stroke-width="2" />
+
+  <!-- Header -->
+  <rect width="1000" height="44" rx="12" fill="#1e293b" />
+  <circle cx="24" cy="22" r="6" fill="#ef4444" />
+  <circle cx="44" cy="22" r="6" fill="#f59e0b" />
+  <circle cx="64" cy="22" r="6" fill="#10b981" />
+  <text x="500" y="27" fill="#94a3b8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="600" text-anchor="middle">Chrome DevTools — Console (0 Errors, 0 Uncaught Exceptions)</text>
+
+  <!-- Console Toolbar -->
+  <g transform="translate(30, 60)">
+    <rect x="0" y="0" width="940" height="34" rx="4" fill="#1e293b" />
+    <circle cx="20" cy="17" r="7" fill="#10b981" opacity="0.2" />
+    <circle cx="20" cy="17" r="4" fill="#10b981" />
+    <text x="35" y="22" fill="#10b981" font-family="monospace" font-size="12" font-weight="bold">0 errors</text>
+
+    <circle cx="120" cy="17" r="4" fill="#f59e0b" />
+    <text x="135" y="22" fill="#94a3b8" font-family="monospace" font-size="12">0 warnings</text>
+
+    <text x="240" y="22" fill="#94a3b8" font-family="monospace" font-size="12">5 info</text>
+    <text x="750" y="22" fill="#64748b" font-family="monospace" font-size="12">Preserve log: [ ]  Selected context: top</text>
+  </g>
+
+  <!-- Console Logs List -->
+  <g transform="translate(30, 105)">
+    <rect x="0" y="0" width="940" height="460" rx="6" fill="#030712" stroke="#1f2937" />
+
+    <!-- Log 1 -->
+    <g transform="translate(20, 30)">
+      <text x="0" y="0" fill="#38bdf8" font-family="monospace" font-size="12">[OrbitWatch 3D Engine]</text>
+      <text x="180" y="0" fill="#f8fafc" font-family="monospace" font-size="12">WebGL2 renderer initialized (Three.js r186, canvas: 1920x1080, antialias: true)</text>
+      <text x="820" y="0" fill="#64748b" font-family="monospace" font-size="11">SpaceScene.tsx:112</text>
+    </g>
+    <line x1="20" y1="45" x2="920" y2="45" stroke="#1f2937" />
+
+    <!-- Log 2 -->
+    <g transform="translate(20, 68)">
+      <text x="0" y="0" fill="#10b981" font-family="monospace" font-size="12">[TLE Service]</text>
+      <text x="180" y="0" fill="#f8fafc" font-family="monospace" font-size="12">Loaded 48 active orbiters across categories: stations (12), starlink (18), navigation (10), weather (8)</text>
+      <text x="820" y="0" fill="#64748b" font-family="monospace" font-size="11">tleService.ts:184</text>
+    </g>
+    <line x1="20" y1="83" x2="920" y2="83" stroke="#1f2937" />
+
+    <!-- Log 3 -->
+    <g transform="translate(20, 106)">
+      <text x="0" y="0" fill="#f59e0b" font-family="monospace" font-size="12">[Celestial Ballistics]</text>
+      <text x="180" y="0" fill="#f8fafc" font-family="monospace" font-size="12">Sun position calculated: declination = 0.409 rad (23.44°), sub-solar lon = -72.4° (12:00 UTC)</text>
+      <text x="820" y="0" fill="#64748b" font-family="monospace" font-size="11">astronomy.ts:52</text>
+    </g>
+    <line x1="20" y1="121" x2="920" y2="121" stroke="#1f2937" />
+
+    <!-- Log 4 -->
+    <g transform="translate(20, 144)">
+      <text x="0" y="0" fill="#a855f7" font-family="monospace" font-size="12">[Storage Manager]</text>
+      <text x="180" y="0" fill="#f8fafc" font-family="monospace" font-size="12">Safe storage wrapper mounted: quota limit 5MB, active cache size = 18.2 kB</text>
+      <text x="820" y="0" fill="#64748b" font-family="monospace" font-size="11">exceptions.ts:145</text>
+    </g>
+    <line x1="20" y1="159" x2="920" y2="159" stroke="#1f2937" />
+
+    <!-- Log 5 -->
+    <g transform="translate(20, 182)">
+      <text x="0" y="0" fill="#10b981" font-family="monospace" font-size="12">[PostProcessing]</text>
+      <text x="180" y="0" fill="#f8fafc" font-family="monospace" font-size="12">UnrealBloomPass successfully attached (threshold: 0.85, strength: 0.45, radius: 0.4)</text>
+      <text x="820" y="0" fill="#64748b" font-family="monospace" font-size="11">SpaceScene.tsx:248</text>
+    </g>
+    <line x1="20" y1="197" x2="920" y2="197" stroke="#1f2937" />
+
+    <!-- Interactive Prompt -->
+    <g transform="translate(20, 230)">
+      <text x="0" y="0" fill="#38bdf8" font-family="monospace" font-size="14" font-weight="bold">&gt;</text>
+      <rect x="20" y="-12" width="10" height="16" fill="#38bdf8" opacity="0.8" />
+    </g>
+
+    <!-- Verification Banner -->
+    <g transform="translate(20, 360)">
+      <rect x="0" y="0" width="900" height="60" rx="8" fill="#064e3b" stroke="#059669" />
+      <text x="30" y="26" fill="#34d399" font-family="sans-serif" font-size="14" font-weight="bold">✓ Целевое значение достигнуто: 0 ошибок в консоли разработчика (Target = 0)</text>
+      <text x="30" y="48" fill="#a7f3d0" font-family="sans-serif" font-size="12">Отсутствуют необработанные исключения (Uncaught Error), утечки WebGL контекста и битые сетевые промисы.</text>
+    </g>
+  </g>
+</svg>

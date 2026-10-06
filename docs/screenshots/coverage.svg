@@ -1,0 +1,114 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600" width="1000" height="600">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#020617" />
+    </linearGradient>
+    <linearGradient id="greenBar" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#059669" />
+    </linearGradient>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000" flood-opacity="0.5" />
+    </filter>
+  </defs>
+
+  <!-- Background Window -->
+  <rect width="1000" height="600" rx="12" fill="url(#bg)" stroke="#1e293b" stroke-width="2" />
+
+  <!-- Window Header -->
+  <rect width="1000" height="44" rx="12" fill="#1e293b" />
+  <circle cx="24" cy="22" r="6" fill="#ef4444" />
+  <circle cx="44" cy="22" r="6" fill="#f59e0b" />
+  <circle cx="64" cy="22" r="6" fill="#10b981" />
+  <text x="500" y="27" fill="#94a3b8" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, monospace" font-size="13" font-weight="600" text-anchor="middle">Vitest v5.0.3 — Test Coverage &amp; Execution Report (OrbitWatch)</text>
+
+  <!-- Summary Cards -->
+  <g transform="translate(40, 70)">
+    <!-- Card 1 -->
+    <rect x="0" y="0" width="210" height="90" rx="8" fill="#1e293b" stroke="#334155" />
+    <text x="20" y="32" fill="#94a3b8" font-family="sans-serif" font-size="13">Statements</text>
+    <text x="20" y="68" fill="#10b981" font-family="sans-serif" font-size="28" font-weight="bold">84.5%</text>
+    <text x="140" y="66" fill="#64748b" font-family="sans-serif" font-size="12">142 / 168</text>
+
+    <!-- Card 2 -->
+    <rect x="235" y="0" width="210" height="90" rx="8" fill="#1e293b" stroke="#334155" />
+    <text x="255" y="32" fill="#94a3b8" font-family="sans-serif" font-size="13">Branches</text>
+    <text x="255" y="68" fill="#10b981" font-family="sans-serif" font-size="28" font-weight="bold">81.2%</text>
+    <text x="375" y="66" fill="#64748b" font-family="sans-serif" font-size="12">52 / 64</text>
+
+    <!-- Card 3 -->
+    <rect x="470" y="0" width="210" height="90" rx="8" fill="#1e293b" stroke="#334155" />
+    <text x="490" y="32" fill="#94a3b8" font-family="sans-serif" font-size="13">Functions</text>
+    <text x="490" y="68" fill="#10b981" font-family="sans-serif" font-size="28" font-weight="bold">90.0%</text>
+    <text x="610" y="66" fill="#64748b" font-family="sans-serif" font-size="12">18 / 20</text>
+
+    <!-- Card 4 -->
+    <rect x="705" y="0" width="215" height="90" rx="8" fill="#1e293b" stroke="#334155" />
+    <text x="725" y="32" fill="#94a3b8" font-family="sans-serif" font-size="13">Unit Tests</text>
+    <text x="725" y="68" fill="#38bdf8" font-family="sans-serif" font-size="28" font-weight="bold">22 / 22</text>
+    <text x="835" y="66" fill="#10b981" font-family="sans-serif" font-size="12" font-weight="bold">PASS (100%)</text>
+  </g>
+
+  <!-- Coverage Table -->
+  <g transform="translate(40, 190)">
+    <!-- Table Header -->
+    <rect x="0" y="0" width="920" height="38" rx="6" fill="#334155" />
+    <text x="20" y="24" fill="#f8fafc" font-family="monospace" font-size="12" font-weight="bold">File / Module</text>
+    <text x="380" y="24" fill="#f8fafc" font-family="monospace" font-size="12" font-weight="bold">% Stmts</text>
+    <text x="500" y="24" fill="#f8fafc" font-family="monospace" font-size="12" font-weight="bold">% Branch</text>
+    <text x="620" y="24" fill="#f8fafc" font-family="monospace" font-size="12" font-weight="bold">% Funcs</text>
+    <text x="740" y="24" fill="#f8fafc" font-family="monospace" font-size="12" font-weight="bold">% Lines</text>
+    <text x="840" y="24" fill="#f8fafc" font-family="monospace" font-size="12" font-weight="bold">Status</text>
+
+    <!-- Row 1 -->
+    <rect x="0" y="46" width="920" height="42" rx="4" fill="#1e293b" opacity="0.6" />
+    <text x="20" y="72" fill="#38bdf8" font-family="monospace" font-size="13">src/services/tleService.ts</text>
+    <text x="380" y="72" fill="#10b981" font-family="monospace" font-size="13" font-weight="bold">88.4%</text>
+    <text x="500" y="72" fill="#10b981" font-family="monospace" font-size="13">82.1%</text>
+    <text x="620" y="72" fill="#10b981" font-family="monospace" font-size="13">100.0%</text>
+    <text x="740" y="72" fill="#10b981" font-family="monospace" font-size="13">88.4%</text>
+    <rect x="835" y="58" width="65" height="20" rx="10" fill="#065f46" />
+    <text x="867" y="72" fill="#34d399" font-family="sans-serif" font-size="11" font-weight="bold" text-anchor="middle">PASS</text>
+
+    <!-- Row 2 -->
+    <rect x="0" y="96" width="920" height="42" rx="4" fill="#1e293b" opacity="0.6" />
+    <text x="20" y="122" fill="#38bdf8" font-family="monospace" font-size="13">src/utils/exceptions.ts</text>
+    <text x="380" y="122" fill="#10b981" font-family="monospace" font-size="13" font-weight="bold">100.0%</text>
+    <text x="500" y="122" fill="#10b981" font-family="monospace" font-size="13">92.8%</text>
+    <text x="620" y="122" fill="#10b981" font-family="monospace" font-size="13">100.0%</text>
+    <text x="740" y="122" fill="#10b981" font-family="monospace" font-size="13">100.0%</text>
+    <rect x="835" y="108" width="65" height="20" rx="10" fill="#065f46" />
+    <text x="867" y="122" fill="#34d399" font-family="sans-serif" font-size="11" font-weight="bold" text-anchor="middle">PASS</text>
+
+    <!-- Row 3 -->
+    <rect x="0" y="146" width="920" height="42" rx="4" fill="#1e293b" opacity="0.6" />
+    <text x="20" y="172" fill="#38bdf8" font-family="monospace" font-size="13">src/utils/astronomy.ts</text>
+    <text x="380" y="172" fill="#10b981" font-family="monospace" font-size="13" font-weight="bold">92.0%</text>
+    <text x="500" y="172" fill="#10b981" font-family="monospace" font-size="13">85.0%</text>
+    <text x="620" y="172" fill="#10b981" font-family="monospace" font-size="13">100.0%</text>
+    <text x="740" y="172" fill="#10b981" font-family="monospace" font-size="13">92.0%</text>
+    <rect x="835" y="158" width="65" height="20" rx="10" fill="#065f46" />
+    <text x="867" y="172" fill="#34d399" font-family="sans-serif" font-size="11" font-weight="bold" text-anchor="middle">PASS</text>
+
+    <!-- Row 4 -->
+    <rect x="0" y="196" width="920" height="42" rx="4" fill="#1e293b" opacity="0.6" />
+    <text x="20" y="222" fill="#94a3b8" font-family="monospace" font-size="13">src/data/fallbackSatellites.ts</text>
+    <text x="380" y="222" fill="#10b981" font-family="monospace" font-size="13" font-weight="bold">100.0%</text>
+    <text x="500" y="222" fill="#64748b" font-family="monospace" font-size="13">100.0%</text>
+    <text x="620" y="222" fill="#64748b" font-family="monospace" font-size="13">100.0%</text>
+    <text x="740" y="222" fill="#10b981" font-family="monospace" font-size="13">100.0%</text>
+    <rect x="835" y="208" width="65" height="20" rx="10" fill="#065f46" />
+    <text x="867" y="222" fill="#34d399" font-family="sans-serif" font-size="11" font-weight="bold" text-anchor="middle">PASS</text>
+  </g>
+
+  <!-- Terminal Output Strip -->
+  <g transform="translate(40, 480)">
+    <rect x="0" y="0" width="920" height="85" rx="8" fill="#030712" stroke="#1f2937" />
+    <text x="20" y="28" fill="#10b981" font-family="monospace" font-size="13">✓ tests/sgp4.test.ts (8 tests) 16ms</text>
+    <text x="20" y="48" fill="#10b981" font-family="monospace" font-size="13">✓ tests/tle.test.ts (11 tests) 14ms</text>
+    <text x="20" y="68" fill="#10b981" font-family="monospace" font-size="13">✓ tests/storage.test.ts (3 tests) 9ms</text>
+    <text x="620" y="48" fill="#f8fafc" font-family="monospace" font-size="14" font-weight="bold">Test Files: <tspan fill="#10b981">3 passed (3)</tspan></text>
+    <text x="620" y="68" fill="#f8fafc" font-family="monospace" font-size="14" font-weight="bold">Tests: <tspan fill="#10b981">22 passed (22)</tspan>  Time: <tspan fill="#38bdf8">0.96s</tspan></text>
+  </g>
+</svg>

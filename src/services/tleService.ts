@@ -8,9 +8,22 @@ export const EARTH_RADIUS_KM = 6371;
 export const GLOBE_RADIUS_UNITS = 10.0;
 export const SCALE_KM_TO_UNITS = GLOBE_RADIUS_UNITS / EARTH_RADIUS_KM;
 
+// Named ballistic constants (NC-01 fix: eliminate magic numbers)
+export const DEFAULT_ORBITAL_SPEED_KM_S = 7.5;
+export const MIN_VALID_PERIOD_MIN = 10;
+export const MAX_VALID_PERIOD_MIN = 3000;
+export const DEFAULT_LEO_PERIOD_MIN = 95;
+export const MS_PER_MINUTE = 60_000;
+export const DEFAULT_TRAJECTORY_STEPS = 120;
+
 // Cache of compiled satrec objects for performance
 const satrecCache = new Map<string, any>();
 
+/**
+ * Compiles and returns a cached SGP4 satrec object for a satellite.
+ * @param sat - SatelliteItem containing NORAD TLE line1 and line2
+ * @returns Compiled satellite.js satrec structure or null on failure
+ */
 export function getSatrec(sat: SatelliteItem): any {
   if (satrecCache.has(sat.id)) {
     return satrecCache.get(sat.id);
@@ -26,7 +39,10 @@ export function getSatrec(sat: SatelliteItem): any {
 }
 
 /**
- * Calculates current 3D position, lat, lng, altitude, and speed for a satellite
+ * Calculates current 3D position, latitude, longitude, altitude, and speed for a satellite at a given time.
+ * @param sat - Target SatelliteItem
+ * @param date - UTC Date of calculation
+ * @returns CurrentPosition with coordinates in Three.js units and geodetic values, or null if propagation fails
  */
 export function calculateSatellitePosition(sat: SatelliteItem, date: Date): CurrentPosition | null {
   const satrec = getSatrec(sat);
@@ -51,7 +67,7 @@ export function calculateSatellitePosition(sat: SatelliteItem, date: Date): Curr
     const lng = satellite.radiansToDegrees(geodetic.longitude);
     const altitudeKm = geodetic.height;
 
-    let speedKmS = 7.5;
+    let speedKmS = DEFAULT_ORBITAL_SPEED_KM_S;
     if (velocityEci && typeof velocityEci === 'object' && !isNaN(velocityEci.x)) {
       speedKmS = Math.sqrt(
         velocityEci.x * velocityEci.x +
@@ -76,21 +92,31 @@ export function calculateSatellitePosition(sat: SatelliteItem, date: Date): Curr
       altitudeKm,
       speedKmS
     };
-  } catch (err) {
+  } catch {
     return null;
   }
 }
 
 /**
- * Computes complete 3D orbital trajectory points for one full period
+ * Computes complete 3D orbital trajectory points for one full revolution period.
+ * @param sat - Target SatelliteItem
+ * @param baseDate - Starting reference date/time
+ * @param numSteps - Number of discrete points to compute along the trajectory loop
+ * @returns Array of OrbitPoint {x, y, z} representing the orbital path
  */
-export function calculateOrbitTrajectory(sat: SatelliteItem, baseDate: Date, numSteps = 120): OrbitPoint[] {
+export function calculateOrbitTrajectory(
+  sat: SatelliteItem,
+  baseDate: Date,
+  numSteps = DEFAULT_TRAJECTORY_STEPS
+): OrbitPoint[] {
   const satrec = getSatrec(sat);
   if (!satrec) return [];
 
   const points: OrbitPoint[] = [];
-  const periodMin = sat.periodMin > 10 && sat.periodMin < 3000 ? sat.periodMin : 95;
-  const totalMs = periodMin * 60 * 1000;
+  const periodMin = sat.periodMin > MIN_VALID_PERIOD_MIN && sat.periodMin < MAX_VALID_PERIOD_MIN
+    ? sat.periodMin
+    : DEFAULT_LEO_PERIOD_MIN;
+  const totalMs = periodMin * MS_PER_MINUTE;
   const stepMs = totalMs / numSteps;
 
   const startTime = baseDate.getTime();
@@ -109,7 +135,7 @@ export function calculateOrbitTrajectory(sat: SatelliteItem, baseDate: Date, num
         }
       }
     } catch {
-      // skip
+      // skip invalid points
     }
   }
 
