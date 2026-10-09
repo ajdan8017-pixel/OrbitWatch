@@ -51,7 +51,6 @@
 > orbitwatch@1.0.0 test
 > vitest run
 
- ✓ tests/storage.test.ts (3 tests) 9ms
  ✓ tests/astronomy.test.ts (4 tests) 9ms
 
  Test Files  4 passed (4)
