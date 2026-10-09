@@ -16,7 +16,8 @@ import {
   Award,
   Maximize2,
   Minimize2,
-  FileText
+  FileText,
+  Download
 } from 'lucide-react';
 import { PRESENTATION_SLIDES, SlideItem } from '../../data/presentationSlides';
 import { sounds } from '../../utils/soundManager';
@@ -191,6 +192,17 @@ export const PresentationModal: React.FC<PresentationModalProps> = ({
               <FileText className="w-3.5 h-3.5 text-indigo-400" />
               <span className="hidden md:inline">Заметки спикера</span>
             </button>
+
+            {/* Download PPTX presentation button */}
+            <a
+              href="/presentation.pptx"
+              download="OrbitWatch_Presentation_Shinin_Chayan_ISP-43.pptx"
+              className="px-2.5 py-1.5 rounded-xl text-xs font-medium border bg-emerald-950/80 hover:bg-emerald-900 text-emerald-300 border-emerald-700/60 transition-colors flex items-center gap-1.5"
+              title="Скачать готовую презентацию в формате Microsoft PowerPoint (.pptx)"
+            >
+              <Download className="w-3.5 h-3.5 text-emerald-400" />
+              <span className="hidden sm:inline">Скачать .PPTX</span>
+            </a>
 
             {/* Toggle Fullscreen */}
             <button
