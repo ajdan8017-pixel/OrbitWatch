@@ -369,3 +369,22 @@ export function getSpriteTextureForCategory(category: SatelliteCategory): THREE.
       return createDefaultSpriteTexture();
   }
 }
+
+// Global material pool (BR-04 fix: reuse single SpriteMaterial per category instead of creating N materials)
+const categoryMaterialCache = new Map<SatelliteCategory, THREE.SpriteMaterial>();
+
+export function getSharedSpriteMaterial(category: SatelliteCategory): THREE.SpriteMaterial {
+  if (categoryMaterialCache.has(category)) {
+    return categoryMaterialCache.get(category)!;
+  }
+  const texture = getSpriteTextureForCategory(category);
+  const mat = new THREE.SpriteMaterial({
+    map: texture,
+    transparent: true,
+    depthWrite: false,
+    depthTest: true
+  });
+  categoryMaterialCache.set(category, mat);
+  return mat;
+}
+

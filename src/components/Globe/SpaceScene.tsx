@@ -25,6 +25,7 @@ import {
 } from '../../utils/earthTextures';
 import {
   getSpriteTextureForCategory,
+  getSharedSpriteMaterial,
   createSelectionRingTexture,
   createSunCoronaTexture,
   createMoonTexture
@@ -435,12 +436,27 @@ export const SpaceScene: React.FC<SpaceSceneProps> = ({
     };
     window.addEventListener('resize', handleResize);
 
-    // N. Animation Loop with Clock
+    // N. Animation Loop with Clock and visibility optimization (BR-03 fix)
     let animId: number;
+    let isTabVisible = !document.hidden;
     const clock = new THREE.Clock();
+
+    const handleVisibilityChange = () => {
+      isTabVisible = !document.hidden;
+      if (isTabVisible) {
+        // Reset delta time so animations don't jump after returning to tab
+        clock.getDelta();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 
     const animate = () => {
       animId = requestAnimationFrame(animate);
+
+      // Throttle rendering and computation when tab is hidden to save GPU/battery
+      if (!isTabVisible) {
+        return;
+      }
 
       const delta = clock.getDelta();
       const elapsed = clock.getElapsedTime();
@@ -485,6 +501,7 @@ export const SpaceScene: React.FC<SpaceSceneProps> = ({
     return () => {
       cancelAnimationFrame(animId);
       window.removeEventListener('resize', handleResize);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       renderer.dispose();
       composer.dispose();
       if (container.contains(renderer.domElement)) {
@@ -550,13 +567,8 @@ export const SpaceScene: React.FC<SpaceSceneProps> = ({
         newSprites.set(sat.id, entry);
         currentSprites.delete(sat.id);
       } else {
-        const texture = getSpriteTextureForCategory(sat.category);
-        const spriteMat = new THREE.SpriteMaterial({
-          map: texture,
-          transparent: true,
-          depthWrite: false,
-          depthTest: true
-        });
+        // Pool sprite material by category to prevent micro-freezes (BR-04 fix)
+        const spriteMat = getSharedSpriteMaterial(sat.category);
         const sprite = new THREE.Sprite(spriteMat);
         sprite.userData = { satId: sat.id, sat };
 
@@ -572,7 +584,7 @@ export const SpaceScene: React.FC<SpaceSceneProps> = ({
     // Remove sprites that are no longer filtered
     currentSprites.forEach(({ sprite }) => {
       satGroup.remove(sprite);
-      sprite.material.dispose();
+      // Notice: materials are shared from pool, do not dispose shared material
     });
 
     satSpritesMap.current = newSprites;

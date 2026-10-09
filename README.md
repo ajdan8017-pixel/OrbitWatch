@@ -1,7 +1,8 @@
 # OrbitWatch — 3D Космический Трекер
 
-[![Vitest Unit Tests](https://img.shields.io/badge/Vitest-22%2F22%20PASS-brightgreen.svg)](docs/test-coverage.md)
+[![Vitest Unit Tests](https://img.shields.io/badge/Vitest-26%2F26%20PASS-brightgreen.svg)](docs/test-coverage.md)
 [![Bundle Size](https://img.shields.io/badge/Bundle%20Size-377%20KB%20gzip-blue.svg)](docs/quality-metrics.md)
+[![Readiness](https://img.shields.io/badge/Readiness-100%25%20Ready-success.svg)](docs/readiness-checklist.md)
 [![Lighthouse](https://img.shields.io/badge/Lighthouse-96%2F100-success.svg)](docs/quality-metrics.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -74,13 +75,14 @@ npm test
 ```
 
 ```text
- ✓ tests/sgp4.test.ts (8 tests) 17ms
- ✓ tests/tle.test.ts (11 tests) 16ms
- ✓ tests/storage.test.ts (3 tests) 10ms
+ ✓ tests/sgp4.test.ts (8 tests) 13ms
+ ✓ tests/tle.test.ts (11 tests) 11ms
+ ✓ tests/storage.test.ts (3 tests) 9ms
+ ✓ tests/astronomy.test.ts (4 tests) 9ms
 
- Test Files  3 passed (3)
-      Tests  22 passed (22)
-   Duration  1.03s
+ Test Files  4 passed (4)
+      Tests  26 passed (26)
+   Duration  1.22s
 ```
 
 ---
@@ -89,16 +91,18 @@ npm test
 
 Полный комплект проектной документации расположен в папке `docs/`:
 
-1. 🎯 **[Презентация для защиты (PowerPoint .pptx)](docs/presentation.pptx)** ([текстовая структура в markdown](docs/presentation.md)) — готовая 15-слайдовая презентация в формате Microsoft PowerPoint (.pptx).
-2. 🎙️ **[Текст выступления докладчика (Речь)](docs/presentation-speech.md)** — сценарий публичной защиты на 7–8 минут с блоком ответов на вопросы комиссии.
-3. 📅 **[Дневник практики — День 15](docs/practice-diary-day-15.md)** — протокол репетиции защиты, почасовой план и завершение практики.
-4. 📖 **[Руководство пользователя](docs/user-guide.md)** — описание интерфейса, ролей, сценариев управления 3D-сценой и FAQ.
-5. ⚙️ **[Руководство по установке и администрированию](docs/install-guide.md)** — системные требования, Docker, Nginx и PM2.
-6. 📝 **[История изменений (CHANGELOG.md)](CHANGELOG.md)** — лог версий по стандарту Keep a Changelog.
-7. 📊 **[Отчёт о метриках качества ПО](docs/quality-metrics.md)** — замеры LOC, цикломатической сложности, размера бандла и скорости.
-8. 🌿 **[Стратегия ветвления Git](docs/git-strategy.md)** — регламент веток, правила коммитов, разрешение конфликтов.
-9. 🔍 **[Отчёт об инспекции кода](docs/inspection-report.md)** — устранение замечаний NC-01..NC-08 и чек-лист кодирования.
-10. 🧪 **[Отчёт о тестовом покрытии](docs/test-coverage.md)** — матрица покрытия астродинамических функций (22/22 тестов PASS).
+1. ✅ **[Чек-лист готовности проекта (100% Ready)](docs/readiness-checklist.md)** — полный итоговый аудит готовности к защите (функциональность, код, тесты, документация).
+2. 🎯 **[Презентация для защиты (PowerPoint .pptx)](docs/presentation.pptx)** ([текстовая структура в markdown](docs/presentation.md)) — готовая 15-слайдовая презентация в формате Microsoft PowerPoint (.pptx).
+3. 🎙️ **[Текст выступления докладчика (Речь)](docs/presentation-speech.md)** — сценарий публичной защиты на 7–8 минут с блоком ответов на вопросы комиссии.
+4. 📅 **[Дневник практики — День 16](docs/practice-diary-day-16.md)** — финальная доработка, устранение дефектов, чек-лист 100% готовности.
+5. 📅 **[Дневник практики — День 15](docs/practice-diary-day-15.md)** — протокол репетиции защиты, хронометраж выступления.
+6. 📖 **[Руководство пользователя](docs/user-guide.md)** — описание интерфейса, ролей, сценариев управления 3D-сценой и FAQ.
+7. ⚙️ **[Руководство по установке и администрированию](docs/install-guide.md)** — системные требования, Docker, Nginx и PM2.
+8. 📝 **[История изменений (CHANGELOG.md)](CHANGELOG.md)** — лог версий по стандарту Keep a Changelog.
+9. 📊 **[Отчёт о метриках качества ПО](docs/quality-metrics.md)** — замеры LOC, цикломатической сложности, размера бандла и скорости.
+10. 🌿 **[Стратегия ветвления Git](docs/git-strategy.md)** — регламент веток, правила коммитов, разрешение конфликтов.
+11. 🔍 **[Отчёт об инспекции кода](docs/inspection-report.md)** — устранение замечаний NC-01..NC-08 и чек-лист кодирования.
+12. 🧪 **[Отчёт о тестовом покрытии](docs/test-coverage.md)** — матрица покрытия астродинамических функций (26/26 тестов PASS).
 
 > 💡 **Интерактивный режим защиты в приложении:** В верхнем меню веб-приложения доступна кнопка **«Защита v1.0»** (иконка медали), запускающая полноэкранный плеер презентации со встроенным таймером регламента, шпаргалкой текста спикера и переходом в Live Demo.
 

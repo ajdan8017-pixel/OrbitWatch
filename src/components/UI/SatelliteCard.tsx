@@ -67,7 +67,7 @@ export const SatelliteCard: React.FC<SatelliteCardProps> = ({
       animate={{ x: 0, opacity: 1, scale: 1 }}
       exit={{ x: -80, opacity: 0, scale: 0.95 }}
       transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-      className="absolute top-18 left-4 sm:left-6 z-30 w-80 sm:w-92 bg-slate-950/92 backdrop-blur-2xl border border-slate-800/90 rounded-3xl shadow-2xl shadow-cyan-950/20 text-slate-100 overflow-hidden"
+      className="absolute top-18 left-4 sm:left-6 z-30 w-80 sm:w-92 max-h-[calc(100vh-8.5rem)] overflow-y-auto custom-scrollbar bg-slate-950/92 backdrop-blur-2xl border border-slate-800/90 rounded-3xl shadow-2xl shadow-cyan-950/20 text-slate-100"
     >
       {/* Header bar */}
       <div className="flex items-start justify-between p-4 pb-3 border-b border-slate-800/80 bg-slate-900/50">
