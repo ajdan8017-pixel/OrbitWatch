@@ -6,6 +6,7 @@ import { FilterBar } from './components/UI/FilterBar';
 import { TimeController } from './components/UI/TimeController';
 import { SatelliteListDrawer } from './components/UI/SatelliteListDrawer';
 import { MissionsModal } from './components/UI/MissionsModal';
+import { PresentationModal } from './components/UI/PresentationModal';
 import { ToastProvider, useToast } from './components/UI/ToastContainer';
 import {
   SatelliteItem,
@@ -26,13 +27,14 @@ function OrbitWatchMain() {
   const [selectedSat, setSelectedSat] = useState<SatelliteItem | null>(null);
   const [dataSource, setDataSource] = useState<'celestrak' | 'cache' | 'fallback'>('fallback');
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
-  const [isUpdatingTLE, setIsUpdatingTLE] = useState<boolean>(false);
+  const [isUpdatingTLE, setIsUpdatingTLE] = useState<boolean>(true);
 
   // View & Mode States
   const [isAutoRotate, setIsAutoRotate] = useState<boolean>(true);
   const [isTrackSatellite, setIsTrackSatellite] = useState<boolean>(false);
   const [isMissionsOpen, setIsMissionsOpen] = useState<boolean>(false);
   const [isSatListOpen, setIsSatListOpen] = useState<boolean>(false);
+  const [isPresentationOpen, setIsPresentationOpen] = useState<boolean>(false);
   const [isBloomEnabled, setIsBloomEnabled] = useState<boolean>(true);
 
   // Filters State
@@ -52,10 +54,12 @@ function OrbitWatchMain() {
     isPaused: false
   });
 
+  const showToastRef = useRef(showToast);
+  showToastRef.current = showToast;
+
   // Load initial satellites on mount
   useEffect(() => {
     let isMounted = true;
-    setIsUpdatingTLE(true);
 
     loadInitialSatelliteCatalog()
       .then((res) => {
@@ -65,14 +69,14 @@ function OrbitWatchMain() {
         setLastUpdated(res.timestamp);
         setIsUpdatingTLE(false);
 
-        showToast({
+        showToastRef.current({
           type: res.source === 'celestrak' ? 'success' : 'info',
           title: res.source === 'celestrak' ? 'Данные CelesTrak обновлены' : 'Загружен кэш TLE',
           message: `В каталоге ${res.satellites.length} спутников на орбите`
         });
 
         // Pre-select ISS (ZARYA) by default for immediate engagement
-        const iss = res.satellites.find(s => s.id === '25544');
+        const iss = res.satellites.find((s) => s.id === '25544');
         if (iss) {
           setSelectedSat(iss);
         }
@@ -81,7 +85,7 @@ function OrbitWatchMain() {
         console.error('Failed to load initial satellite catalog:', err);
         if (isMounted) {
           setIsUpdatingTLE(false);
-          showToast({
+          showToastRef.current({
             type: 'warning',
             title: 'Сбой подключения к CelesTrak',
             message: 'Используются резервные орбитальные данные'
@@ -92,13 +96,13 @@ function OrbitWatchMain() {
     return () => {
       isMounted = false;
     };
-  }, [showToast]);
+  }, []);
 
   // Manual TLE refresh
   const handleRefreshTLE = useCallback(async () => {
     sounds.playWarp();
     setIsUpdatingTLE(true);
-    showToast({
+    showToastRef.current({
       type: 'info',
       title: 'Синхронизация с CelesTrak...',
       message: 'Запрос свежих TLE строк...'
@@ -109,14 +113,14 @@ function OrbitWatchMain() {
       setSatellites(res.satellites);
       setDataSource(res.source);
       setLastUpdated(res.timestamp);
-      showToast({
+      showToastRef.current({
         type: 'success',
         title: 'Орбиты актуализированы',
         message: `Обновлено ${res.satellites.length} объектов`
       });
     } catch (err) {
       console.warn('TLE update error:', err);
-      showToast({
+      showToastRef.current({
         type: 'warning',
         title: 'Ошибка обновления TLE',
         message: 'Проверьте сетевое соединение'
@@ -124,10 +128,11 @@ function OrbitWatchMain() {
     } finally {
       setIsUpdatingTLE(false);
     }
-  }, [showToast]);
+  }, []);
 
   // Animation time-step loop for simulation
   const lastRealTimeRef = useRef<number>(performance.now());
+  const lastStateUpdateRef = useRef<number>(performance.now());
 
   useEffect(() => {
     let animId: number;
@@ -137,19 +142,24 @@ function OrbitWatchMain() {
       lastRealTimeRef.current = now;
 
       if (!timeState.isPaused && deltaSec > 0 && deltaSec < 2) {
-        setTimeState((prev) => {
-          const addedMs = deltaSec * prev.speedMultiplier * 1000;
-          return {
-            ...prev,
-            simulatedTime: new Date(prev.simulatedTime.getTime() + addedMs)
-          };
-        });
+        if (now - lastStateUpdateRef.current >= 35) {
+          const elapsedSec = (now - lastStateUpdateRef.current) / 1000;
+          lastStateUpdateRef.current = now;
+          setTimeState((prev) => {
+            const addedMs = elapsedSec * prev.speedMultiplier * 1000;
+            return {
+              ...prev,
+              simulatedTime: new Date(prev.simulatedTime.getTime() + addedMs)
+            };
+          });
+        }
       }
 
       animId = requestAnimationFrame(tick);
     };
 
     lastRealTimeRef.current = performance.now();
+    lastStateUpdateRef.current = performance.now();
     animId = requestAnimationFrame(tick);
 
     return () => {
@@ -164,38 +174,53 @@ function OrbitWatchMain() {
       isPaused: false
     });
     sounds.playPing();
-    showToast({
+    showToastRef.current({
       type: 'info',
       title: 'Синхронизация времени',
       message: 'Текущее реальное время UTC'
     });
-  }, [showToast]);
+  }, []);
 
   // Selected satellite handler
   const handleSelectSatellite = useCallback((sat: SatelliteItem | null) => {
     setSelectedSat(sat);
     if (sat) {
       setIsAutoRotate(false);
-      showToast({
+      showToastRef.current({
         type: 'satellite',
         title: sat.name,
         message: `NORAD ${sat.id} • Апогей ~${sat.apogeeKm} км`
       });
     }
-  }, [showToast]);
+  }, []);
 
   // Bloom toggle handler
   const handleToggleBloom = useCallback(() => {
     setIsBloomEnabled((prev) => {
       const next = !prev;
-      showToast({
+      showToastRef.current({
         type: 'info',
         title: next ? 'Bloom Glow: Включен' : 'Bloom Glow: Выключен',
         message: next ? 'Кинематографическое свечение активно' : 'Стандартный рендеринг'
       });
       return next;
     });
-  }, [showToast]);
+  }, []);
+
+  const handleToggleAutoRotate = useCallback(() => {
+    setIsAutoRotate((prev) => !prev);
+  }, []);
+
+  const handleToggleTrackSatellite = useCallback((val: boolean) => {
+    setIsTrackSatellite(val);
+    if (val && selectedSat) {
+      showToastRef.current({
+        type: 'info',
+        title: 'Сопровождение объекта',
+        message: `Камера зафиксирована на ${selectedSat.name}`
+      });
+    }
+  }, [selectedSat]);
 
   // Compute category counts for filters
   const categoryCounts = useMemo(() => {
@@ -260,6 +285,10 @@ function OrbitWatchMain() {
           sounds.playSelect();
           setIsSatListOpen(true);
         }}
+        onOpenPresentation={() => {
+          sounds.playSelect();
+          setIsPresentationOpen(true);
+        }}
         simulatedTime={timeState.simulatedTime}
         isRealtime={isRealtime}
         isBloomEnabled={isBloomEnabled}
@@ -274,18 +303,9 @@ function OrbitWatchMain() {
         filters={filters}
         timeState={timeState}
         isAutoRotate={isAutoRotate}
-        onToggleAutoRotate={() => setIsAutoRotate(!isAutoRotate)}
+        onToggleAutoRotate={handleToggleAutoRotate}
         isTrackSatellite={isTrackSatellite}
-        onToggleTrackSatellite={(val) => {
-          setIsTrackSatellite(val);
-          if (val && selectedSat) {
-            showToast({
-              type: 'info',
-              title: 'Сопровождение объекта',
-              message: `Камера зафиксирована на ${selectedSat.name}`
-            });
-          }
-        }}
+        onToggleTrackSatellite={handleToggleTrackSatellite}
         isBloomEnabled={isBloomEnabled}
       />
 
@@ -333,6 +353,18 @@ function OrbitWatchMain() {
       <MissionsModal
         isOpen={isMissionsOpen}
         onClose={() => setIsMissionsOpen(false)}
+      />
+
+      {/* 8. Project Defense & Slides Modal (Day 15) */}
+      <PresentationModal
+        isOpen={isPresentationOpen}
+        onClose={() => setIsPresentationOpen(false)}
+        onSelectSatelliteById={(id) => {
+          const sat = satellites.find((s) => s.id === id);
+          if (sat) {
+            handleSelectSatellite(sat);
+          }
+        }}
       />
     </div>
   );

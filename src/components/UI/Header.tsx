@@ -10,7 +10,8 @@ import {
   Orbit,
   Clock,
   Radio,
-  Sparkles
+  Sparkles,
+  Award
 } from 'lucide-react';
 import { sounds } from '../../utils/soundManager';
 
@@ -23,6 +24,7 @@ interface HeaderProps {
   onRefreshTLE: () => void;
   onOpenMissions: () => void;
   onOpenSatelliteList: () => void;
+  onOpenPresentation: () => void;
   simulatedTime: Date;
   isRealtime: boolean;
   isBloomEnabled: boolean;
@@ -38,6 +40,7 @@ export const Header: React.FC<HeaderProps> = ({
   onRefreshTLE,
   onOpenMissions,
   onOpenSatelliteList,
+  onOpenPresentation,
   simulatedTime,
   isRealtime,
   isBloomEnabled,
@@ -159,6 +162,19 @@ export const Header: React.FC<HeaderProps> = ({
           <Rocket className="w-4 h-4 text-amber-400 group-hover:scale-110 transition-transform" />
           <span className="hidden sm:inline">Миссии & Запуски</span>
           <span className="sm:hidden">Миссии</span>
+        </button>
+
+        {/* Project Defense / Presentation Button (Day 15) */}
+        <button
+          id="btn-open-presentation"
+          onClick={onOpenPresentation}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-950 bg-gradient-to-r from-amber-400 to-amber-300 hover:from-amber-300 hover:to-amber-200 border border-amber-300/60 transition-all shadow-sm shadow-amber-400/20 group"
+          title="Открыть интерактивную презентацию защиты проекта (15 слайдов, таймер доклада, текст речи)"
+        >
+          <Award className="w-4 h-4 text-slate-950 group-hover:scale-110 transition-transform" />
+          <span className="hidden sm:inline">Защита v1.0</span>
+          <span className="sm:hidden">Слайды</span>
+          <span className="px-1.5 py-0.2 rounded text-[10px] font-mono bg-amber-950/20 text-amber-950 font-bold">15</span>
         </button>
 
         {/* Satellite List Drawer Button */}

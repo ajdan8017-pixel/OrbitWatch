@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useMemo } from 'react';
 import { motion } from 'motion/react';
 import {
   SatelliteItem,
@@ -44,11 +44,8 @@ export const SatelliteCard: React.FC<SatelliteCardProps> = ({
   isTracked,
   onToggleTrack
 }) => {
-  const [position, setPosition] = useState<CurrentPosition | null>(null);
-
-  useEffect(() => {
-    const pos = calculateSatellitePosition(sat, simulatedTime);
-    setPosition(pos);
+  const position = useMemo(() => {
+    return calculateSatellitePosition(sat, simulatedTime);
   }, [sat, simulatedTime]);
 
   const catMeta = CATEGORY_NAMES[sat.category] || CATEGORY_NAMES.other;
